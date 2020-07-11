@@ -15,6 +15,11 @@ require('dotenv').config();
 /* superagent */
 const superagent = require('superagent');
 
+/* pg */
+const pg = require('pg');
+const { saveCookies } = require('superagent');
+
+const notclint = new pg.Client(process.env.DBU_RL);
 
 /////////////////////////////////////
 
@@ -29,24 +34,42 @@ app.use(cors());
 app.get('/', (req, res) => {
   res.status(200).send('it is work berfectlly')
 });
-/* http://localhost:3642/location?data=Lunnwood  */
-app.get('/location', (req, res) => {
-  const city = req.query.city;
-  // const locationData = require('./data/ location.json');
-  // const locaData = new Location(city, locationData);
-  let key = process.env.LOCATIONIQ_KEY;
-  let url = `https://eu1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
-  superagent.get(url)
 
-    .then(geoData => {
-      console.log('inside superagent');
-      // console.log(geoData.body);
-      const locationData = new Location(city, geoData.body);
-      // console.log(locationData);
-      res.status(200).json(locationData);
-    });
-  console.log('after superagent');
-});
+/* http://localhost:3642/location?data=Lunnwood  */
+app.get('/location', loc)
+
+function loc(req, res) {
+  const city = req.query.city;
+  let q =`SELECT * FROM LOCATIONS WHERE search_query = '${city}';`
+  notclint.query(q)
+  .then(dbdata=>{
+    // console.log(dbdata);
+    if(dbdata.rows.length==0){
+      
+      const locationData = require('./data/ location.json');
+      const locaData = new Location(city, locationData);
+      let key = process.env.LOCATIONIQ_KEY;
+      let url = `https://eu1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
+      superagent.get(url)
+      .then(geoData => {
+        // console.log(geoData);
+        // console.log(geoData.body);
+        const locationData = new Location(city, geoData.body);
+        // console.log(locationData);
+        let q = `insert into locations(search_query,formatted_query,latitude,longitude) values ($1, $2, $3, $4);`
+        let safevalues =[locationData.search_query,locationData.formatted_query,locationData.latitude,locationData.longitude];
+        notclint.query(q,safevalues)
+        console.log('this from apis');
+        res.status(200).json(locationData);
+      });
+      console.log('after superagent');
+    }else{
+      console.log('this from db');
+      res.status(200).send(dbdata.rows[0]);
+    }
+  })
+}
+
 var ahmad=[];
 function Location(city, locationData) {
   this.search_query = city;
@@ -55,6 +78,8 @@ function Location(city, locationData) {
   this.longitude = locationData[0].lon;
   ahmad.push(this);
 }
+
+
 
 app.get('/weather', (req, res) => {
   // const weatherData = require('./data/weather.json');
@@ -110,7 +135,7 @@ app.get('/trails', (req, res) => {
 
   superagent.get(url)
     .then(trailsData => {
-   let arr = trailsData.body.trails.map(element => {
+      let arr = trailsData.body.trails.map(element => {
         let rR= new Trails(element);
         return rR;
       });
@@ -131,8 +156,32 @@ function Trails(trailsData) {
   this.condition_time = new Date(trailsData.conditionDate).toTimeString();
 }
 
+// app.get('/yelp',yul)
+
+// function yul(req,res){
 
 
+//   let key = process.env.YELP_KEY;
+
+//   let url= `https://api.yelp.com/v3/businesses/search?latitude=${req.query.latitude}&longitude=${req.query.longitude}`
+//   superagent.get(url)
+//     .set({'Authorization': `Bearer ${key}`})
+//     .then(yelpData=>{
+//       let myYelp = yelpData.body.businesses.map(ele=>{
+//         return new Yelp(ele);
+//       })
+//       res.status(200).send(myYelp);
+//     })
+// }
+
+// function Yelp(dataOfYelp) {
+//   this.name = dataOfYelp.name;
+//   this.image_url = dataOfYelp.image_url;
+//   this.price = dataOfYelp.price;
+//   this.rating = dataOfYelp.rating;
+//   this.url = dataOfYelp.url;
+//   this.created_at = Date.now();
+// }
 
 
 
@@ -147,6 +196,13 @@ app.get((error, req, res) => {
 
 
 ////////////////////////////////////////
-app.listen(PORT, () => {
-  console.log(`listening on port ${PORT}`);
-});
+notclint.connect()
+.then(()=>{
+  
+  app.listen(PORT, () => {
+    console.log(`listening on port ${PORT}`);
+  });
+
+})
+
+

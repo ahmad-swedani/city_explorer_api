@@ -42,32 +42,31 @@ function loc(req, res) {
   const city = req.query.city;
   let q =`SELECT * FROM LOCATIONS WHERE search_query = '${city}';`
   notclint.query(q)
-  .then(dbdata=>{
+    .then(dbdata=>{
     // console.log(dbdata);
-    if(dbdata.rows.length==0){
-      
-      const locationData = require('./data/ location.json');
-      const locaData = new Location(city, locationData);
-      let key = process.env.LOCATIONIQ_KEY;
-      let url = `https://eu1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
-      superagent.get(url)
-      .then(geoData => {
-        // console.log(geoData);
-        // console.log(geoData.body);
-        const locationData = new Location(city, geoData.body);
-        // console.log(locationData);
-        let q = `insert into locations(search_query,formatted_query,latitude,longitude) values ($1, $2, $3, $4);`
-        let safevalues =[locationData.search_query,locationData.formatted_query,locationData.latitude,locationData.longitude];
-        notclint.query(q,safevalues)
-        console.log('this from apis');
-        res.status(200).json(locationData);
-      });
-      console.log('after superagent');
-    }else{
-      console.log('this from db');
-      res.status(200).send(dbdata.rows[0]);
-    }
-  })
+      if(dbdata.rows.length==0){
+        const locationData = require('./data/ location.json');
+        const locaData = new Location(city, locationData);
+        let key = process.env.LOCATIONIQ_KEY;
+        let url = `https://eu1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
+        superagent.get(url)
+          .then(geoData => {
+            // console.log(geoData);
+            // console.log(geoData.body);
+            const locationData = new Location(city, geoData.body);
+            // console.log(locationData);
+            let q = `insert into locations(search_query,formatted_query,latitude,longitude) values ($1, $2, $3, $4);`
+            let safevalues =[locationData.search_query,locationData.formatted_query,locationData.latitude,locationData.longitude];
+            notclint.query(q,safevalues)
+            // console.log('this from apis');
+            res.status(200).json(locationData);
+          });
+        // console.log('after superagent');
+      }else{
+        // console.log('this from db');
+        res.status(200).send(dbdata.rows[0]);
+      }
+    })
 }
 
 var ahmad=[];
@@ -102,7 +101,7 @@ app.get('/weather', (req, res) => {
           notArrResult.push(notResult);
 
         }else{
-          console.log(idx)
+          // console.log(idx)
         }
         // console.log(locationData);
       });
@@ -197,12 +196,12 @@ app.get((error, req, res) => {
 
 ////////////////////////////////////////
 notclint.connect()
-.then(()=>{
+  .then(()=>{
   
-  app.listen(PORT, () => {
-    console.log(`listening on port ${PORT}`);
-  });
+    app.listen(PORT, () => {
+      console.log(`listening on port ${PORT}`);
+    });
 
-})
+  })
 
 

@@ -3,14 +3,14 @@
 
 /* this is librarys*/
 ////////////////////////////////////
+/* dotenv */
+require('dotenv').config();
+
 /*express  */
 const express = require('express');
 
 /* who can touch my server */
 const cors = require('cors');
-
-/* dotenv */
-require('dotenv').config();
 
 /* superagent */
 const superagent = require('superagent');

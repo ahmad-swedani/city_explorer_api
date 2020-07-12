@@ -17,7 +17,7 @@ const superagent = require('superagent');
 
 /* pg */
 const pg = require('pg');
-const { saveCookies } = require('superagent');
+// const { saveCookies } = require('superagent');
 
 const notclint = new pg.Client(process.env.DBU_RL);
 
@@ -40,8 +40,9 @@ app.get('/location', loc)
 
 function loc(req, res) {
   const city = req.query.city;
-  let q =`SELECT * FROM LOCATIONS WHERE search_query = '${city}';`
-  notclint.query(q)
+  let q =`SELECT * FROM LOCATIONS WHERE search_query =$1;`
+  let safevalues=[city];
+  notclint.query(q,safevalues)
     .then(dbdata=>{
     // console.log(dbdata);
       if(dbdata.rows.length==0){
@@ -55,7 +56,7 @@ function loc(req, res) {
             // console.log(geoData.body);
             const locationData = new Location(city, geoData.body);
             // console.log(locationData);
-            let q = `insert into locations(search_query,formatted_query,latitude,longitude) values ($1, $2, $3, $4);`
+            let q = `INSERT INTO locations(search_query,formatted_query,latitude,longitude) VALUES ($1, $2, $3, $4);`
             let safevalues =[locationData.search_query,locationData.formatted_query,locationData.latitude,locationData.longitude];
             notclint.query(q,safevalues)
             // console.log('this from apis');
@@ -85,7 +86,7 @@ app.get('/weather', (req, res) => {
   // const nWeather = weatherData.data;
 
   let key = process.env.WEATHER_KEY;
-  let url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${ahmad[0].latitude}&lon=${ahmad[0].longitude}&key=${key}`;
+  let url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${req.query.latitude}&lon=${req.query.longitude}&key=${key}`;
 
   superagent.get(url)
     .then(weatherData => {
@@ -130,7 +131,7 @@ function Weather(weatherData) {
 app.get('/trails', (req, res) => {
 
   let key = process.env.TRAILS_KEY;
-  let url = `http://www.hikingproject.com/data/get-trails?lat=${ahmad[0].latitude}&lon=${ahmad[0].longitude}&maxDistance=10&key=${key}`;
+  let url = `http://www.hikingproject.com/data/get-trails?lat=${req.query.latitude}&lon=${req.query.longitude}&maxDistance=10&key=${key}`;
 
   superagent.get(url)
     .then(trailsData => {

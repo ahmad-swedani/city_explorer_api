@@ -31,9 +31,9 @@ const app = express();
 /*that mean any one can use my server(its will be open to every body) */
 app.use(cors());
 
-app.get('/', (req, res) => {
-  res.status(200).send('it is work berfectlly')
-});
+// app.get('/', (req, res) => {
+//   res.status(200).send('it is work berfectlly')
+// });
 
 /* http://localhost:3642/location?data=Lunnwood  */
 app.get('/location', loc)
@@ -46,8 +46,8 @@ function loc(req, res) {
     .then(dbdata=>{
     // console.log(dbdata);
       if(dbdata.rows.length==0){
-        const locationData = require('./data/ location.json');
-        const locaData = new Location(city, locationData);
+        // const locationData = require('./data/ location.json');
+        // const locaData = new Location(city, locationData);
         let key = process.env.LOCATIONIQ_KEY;
         let url = `https://eu1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
         superagent.get(url)
@@ -206,3 +206,4 @@ notclint.connect()
   })
 
 
+  psql -d city_explorer -f schema.sql

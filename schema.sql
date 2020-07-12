@@ -7,4 +7,3 @@ latitude VARCHAR(255),
 longitude VARCHAR(255)
 );
 
--- insert into locations(search_query,formatted_query,latitude,longitude) values ('amman','tezy','anything','swedani');

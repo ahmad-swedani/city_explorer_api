@@ -1,3 +1,4 @@
+drop table if exists locations;
 
 CREATE TABLE locations(
 ID SERIAL PRIMARY KEY,

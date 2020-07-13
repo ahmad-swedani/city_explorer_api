@@ -31,6 +31,7 @@ const app = express();
 /*that mean any one can use my server(its will be open to every body) */
 app.use(cors());
 
+
 app.get('/', (req, res) => {
   res.status(200).send('it is work berfectlly')
 });

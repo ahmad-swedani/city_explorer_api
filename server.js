@@ -204,6 +204,3 @@ notclint.connect()
     });
 
   })
-
-
-  psql -d city_explorer -f schema.sql

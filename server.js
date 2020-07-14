@@ -19,7 +19,7 @@ const superagent = require('superagent');
 const pg = require('pg');
 // const { saveCookies } = require('superagent');
 
-const notclint = new pg.Client(process.env.DBU_RL);
+const notclint = new pg.Client(process.env.DATABASE_URL);
 
 /////////////////////////////////////
 

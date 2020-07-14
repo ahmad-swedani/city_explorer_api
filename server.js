@@ -158,62 +158,62 @@ function Trails(trailsData) {
 
 
 
-// app.get('/movies',(req,res) =>{
-//   let city = req.query.search_query;
-//   Movie.all =[];
-//   const movieKey = process.env.TMDB_KEY;
-//   let url = `https://api.themoviedb.org/3/search/movie?api_key=${movieKey}&query=${city}&language=en-US`
-//   superagent.get(url)
-//   .then(movieData =>{
-//        movieData.body.results.forEach(element => {
-//       new Movie(element);
-//       });
-//       res.status(200).send(Movie.all)
-//   });
-// });
+app.get('/movies',(req,res) =>{
+  let city = req.query.search_query;
+  Movie.all =[];
+  const movieKey = process.env.TMDB_KEY;
+  let url = `https://api.themoviedb.org/3/search/movie?api_key=${movieKey}&query=${city}&language=en-US`
+  superagent.get(url)
+  .then(movieData =>{
+       movieData.body.results.forEach(element => {
+      new Movie(element);
+      });
+      res.status(200).send(Movie.all)
+  });
+});
 
 
 
-// Movie.all =[];
-// function Movie(dataOfMovie) {
-//     this.title = dataOfMovie.title;
-//     this.overview = dataOfMovie.overview;
-//     this.average_votes = dataOfMovie.vote_average;
-//     this.total_votes = dataOfMovie.vote_count;
-//     this.image_url =`https://image.tmdb.org/t/p/w500${dataOfMovie.poster_path}`; //((dataOfMovie.poster_path) ? dataOfMovie.poster_path : '');//if(!dataOfMovie.poster_path){''};
-//     this.popularity = dataOfMovie.popularity;
-//     this.released_on = dataOfMovie.release_date;
-//     Movie.all.push(this);
+Movie.all =[];
+function Movie(dataOfMovie) {
+    this.title = dataOfMovie.title;
+    this.overview = dataOfMovie.overview;
+    this.average_votes = dataOfMovie.vote_average;
+    this.total_votes = dataOfMovie.vote_count;
+    this.image_url =`https://image.tmdb.org/t/p/w500${dataOfMovie.poster_path}`; //((dataOfMovie.poster_path) ? dataOfMovie.poster_path : '');//if(!dataOfMovie.poster_path){''};
+    this.popularity = dataOfMovie.popularity;
+    this.released_on = dataOfMovie.release_date;
+    Movie.all.push(this);
+
+}
 
 
+app.get('/yelp',yul)
+
+function yul(req,res){
 
 
-// app.get('/yelp',yul)
+  let key = process.env.YELP_KEY;
 
-// function yul(req,res){
+  let url= `https://api.yelp.com/v3/businesses/search?latitude=${req.query.latitude}&longitude=${req.query.longitude}`
+  superagent.get(url)
+    .set({'Authorization': `Bearer ${key}`})
+    .then(yelpData=>{
+      let myYelp = yelpData.body.businesses.map(ele=>{
+        return new Yelp(ele);
+      })
+      res.status(200).send(myYelp);
+    })
+}
 
-
-//   let key = process.env.YELP_KEY;
-
-//   let url= `https://api.yelp.com/v3/businesses/search?latitude=${req.query.latitude}&longitude=${req.query.longitude}`
-//   superagent.get(url)
-//     .set({'Authorization': `Bearer ${key}`})
-//     .then(yelpData=>{
-//       let myYelp = yelpData.body.businesses.map(ele=>{
-//         return new Yelp(ele);
-//       })
-//       res.status(200).send(myYelp);
-//     })
-// }
-
-// function Yelp(dataOfYelp) {
-//   this.name = dataOfYelp.name;
-//   this.image_url = dataOfYelp.image_url;
-//   this.price = dataOfYelp.price;
-//   this.rating = dataOfYelp.rating;
-//   this.url = dataOfYelp.url;
-//   this.created_at = Date.now();
-// }
+function Yelp(dataOfYelp) {
+  this.name = dataOfYelp.name;
+  this.image_url = dataOfYelp.image_url;
+  this.price = dataOfYelp.price;
+  this.rating = dataOfYelp.rating;
+  this.url = dataOfYelp.url;
+  this.created_at = Date.now();
+}
 
 
 

@@ -59,12 +59,12 @@ function loc(req, res) {
             let q = `INSERT INTO locations(search_query,formatted_query,latitude,longitude) VALUES ($1, $2, $3, $4);`
             let safevalues =[locationData.search_query,locationData.formatted_query,locationData.latitude,locationData.longitude];
             notclint.query(q,safevalues)
-            // console.log('this from apis');
+            console.log('this from apis');
             res.status(200).json(locationData);
           });
         // console.log('after superagent');
       }else{
-        // console.log('this from db');
+        console.log('this from db');
         res.status(200).send(dbdata.rows[0]);
       }
     })
@@ -155,6 +155,38 @@ function Trails(trailsData) {
   this.condition_date = new Date(trailsData.conditionDate).toDateString();
   this.condition_time = new Date(trailsData.conditionDate).toTimeString();
 }
+
+
+
+// app.get('/movies',(req,res) =>{
+//   let city = req.query.search_query;
+//   Movie.all =[];
+//   const movieKey = process.env.TMDB_KEY;
+//   let url = `https://api.themoviedb.org/3/search/movie?api_key=${movieKey}&query=${city}&language=en-US`
+//   superagent.get(url)
+//   .then(movieData =>{
+//        movieData.body.results.forEach(element => {
+//       new Movie(element);
+//       });
+//       res.status(200).send(Movie.all)
+//   });
+// });
+
+
+
+// Movie.all =[];
+// function Movie(dataOfMovie) {
+//     this.title = dataOfMovie.title;
+//     this.overview = dataOfMovie.overview;
+//     this.average_votes = dataOfMovie.vote_average;
+//     this.total_votes = dataOfMovie.vote_count;
+//     this.image_url =`https://image.tmdb.org/t/p/w500${dataOfMovie.poster_path}`; //((dataOfMovie.poster_path) ? dataOfMovie.poster_path : '');//if(!dataOfMovie.poster_path){''};
+//     this.popularity = dataOfMovie.popularity;
+//     this.released_on = dataOfMovie.release_date;
+//     Movie.all.push(this);
+
+
+
 
 // app.get('/yelp',yul)
 
